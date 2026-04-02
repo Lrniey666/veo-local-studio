@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#a85a20"/>
+      <stop offset="100%" stop-color="#1b120f"/>
+    </radialGradient>
+  </defs>
+  <rect width="256" height="256" fill="url(#g)"/>
+  <text x="50%" y="57%" dominant-baseline="middle" text-anchor="middle"
+        font-family="Segoe UI, Arial, sans-serif" font-size="68" fill="#f2f2f2">Veo 3</text>
+</svg>

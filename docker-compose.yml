@@ -1,0 +1,10 @@
+services:
+  veo-local-studio:
+    build: .
+    container_name: veo-local-studio
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+    restart: unless-stopped

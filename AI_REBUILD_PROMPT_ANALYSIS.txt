@@ -1,0 +1,629 @@
+Veo 3.1 Local Studio - AI 重建提示詞完整分析
+
+目的
+- 本文件用來在未來需要「重新用 AI 從零重建這個專案」時，提供完整的需求分析、架構摘要、功能規格、限制條件、已知踩坑點，以及可直接貼給 AI 的重建提示詞。
+- 若文件內容與舊 README 或舊對話有衝突，優先以目前專案中的實作行為為準。
+
+========================================
+一、專案定位
+========================================
+
+這是一個以 Python 為主的 Veo 3.1 本機影片生成工具，核心是桌面視窗應用程式，並附帶：
+- FastAPI HTTP API / 靜態頁
+- Discord Bot 互動式斜線指令
+- SQLite 對話與命令歷史
+- CSV / JSON 使用紀錄
+- 可設定主 API 與備援 API
+- 支援多種 Veo 影片生成模式
+
+主要使用情境
+- 使用者在桌面程式中輸入提示詞與素材，選擇片長 / 比例 / 畫質 / 生成類型後生成影片
+- 使用者在 Discord 內使用 `/veo3` 指令進入互動流程
+- 所有生成都會留下歷史與使用紀錄，可重新載入並再生成
+
+========================================
+二、目標技術棧
+========================================
+
+建議技術棧
+- Python 3.10+
+- Tkinter 桌面 UI
+- FastAPI
+- SQLAlchemy
+- SQLite
+- requests
+- discord.py
+- tkinterdnd2
+
+依賴套件
+- fastapi
+- uvicorn[standard]
+- python-multipart
+- sqlalchemy
+- pydantic
+- requests
+- discord.py
+- tkinterdnd2
+
+========================================
+三、目前專案檔案結構重點
+========================================
+
+核心入口
+- launcher.py
+  - 啟動桌面程式
+
+桌面端
+- app/desktop.py
+  - Tkinter 主視窗
+  - 對話管理
+  - 素材上傳 / 排序
+  - 生成參數設定
+  - Discord / API / 成本設定頁
+  - 使用量 / 花費頁面
+  - 教學頁
+
+後端 / API
+- app/main.py
+  - FastAPI app
+  - 對話 / 命令 / 生成 / 設定 / 使用量 API
+
+設定
+- app/config.py
+  - data/app_config.json 的讀寫
+  - 備份檔 app_config.backup.json
+
+資料庫
+- app/db.py
+- app/models.py
+- app/schemas.py
+
+Veo 與影片生成服務
+- app/services/veo_client.py
+  - Google Gemini / 自訂後端 API 呼叫
+  - 7 種生成類型封裝
+  - 成本估算
+
+Discord
+- app/services/discord_bot.py
+  - /veo3 指令
+  - 選單 + 頻道訊息輸入 + 確認 + 生成 + 結果回傳
+
+紀錄
+- app/services/usage_logger.py
+  - data/usage_log.csv
+  - data/usage_log.json
+
+檔案儲存
+- app/services/storage.py
+  - inputs / videos 儲存
+
+啟動 / 工具
+- scripts/run_local.bat
+- scripts/migrate_db.py
+
+========================================
+四、桌面應用程式需求
+========================================
+
+桌面 UI 必須具備
+- 左側：對話清單
+- 中央：提示詞輸入區、素材列表、生成選項、生成按鈕、結果訊息
+- 右側：歷史命令區，可點選載入舊命令再生成
+
+桌面核心功能
+- 新增 / 切換對話
+- 每個對話可保存多筆命令
+- 支援拖放素材
+- 支援一般檔案選取
+- 支援素材排序
+- 可從歷史命令載入提示詞與素材資訊
+- 生成後顯示錯誤或成功資訊
+- 可切換明 / 暗色主題
+- 可開啟 Discord 教學 / Gemini API 教學 / 使用教學
+- 可設定主 API、備援 API、Discord Token、同步伺服器 ID、成本模型
+- 可一鍵重啟程式
+
+桌面設定欄位
+- veo_api_base
+- veo_api_key
+- veo_model
+- max_image_inputs
+- discord_bot_token
+- discord_enabled
+- discord_sync_guild_ids
+- backup_apis
+- cost_per_second_usd
+- quality_multipliers
+- ntd_rate
+- ui_theme
+- ui_state
+
+========================================
+五、HTTP API 需求
+========================================
+
+應提供至少下列 API
+- GET /
+- GET /help
+- GET /api/config
+- PUT /api/config
+- GET /api/conversations
+- POST /api/conversations
+- GET /api/conversations/{id}/commands
+- POST /api/generate
+- GET /api/usage/recent
+- GET /api/usage/stats
+
+/api/generate 需支援
+- conversation_id
+- prompt
+- duration_seconds
+- aspect_ratio
+- quality
+- gen_type
+- source_command_id
+- images[]
+
+回應需包含
+- 影片路徑
+- 原始 provider 回應
+- provider 名稱
+- gen_type
+- 成本估算
+- 失敗時的錯誤訊息
+
+========================================
+六、Discord Bot 需求
+========================================
+
+指令
+- 只保留 `/veo3`
+
+整體流程
+1. 使用者輸入 `/veo3`
+2. Bot 顯示設定卡片
+3. 使用者選擇片長 / 比例 / 畫質 / 生成類型
+4. Bot 在頻道發送提示訊息
+5. 使用者直接在頻道輸入提示詞，並依類型附加圖片或影片
+6. Bot 用 wait_for(message) 擷取使用者那則訊息
+7. Bot 顯示確認卡片
+8. 使用者按下開始生成
+9. Bot 顯示動畫進度
+10. Bot 成功後回傳影片與花費資訊
+11. Bot 失敗時顯示錯誤與重試按鈕
+
+Discord UI 要求
+- 介面文字使用繁體中文
+- 可以加入適量 emoji
+- 每個主要階段要有返回或取消能力
+- 生成完成要顯示：
+  - 片長
+  - 比例
+  - 畫質
+  - 類型
+  - 預估 Token
+  - 預估 USD / NTD
+  - 實際耗時
+  - Discord 使用者 / 伺服器 / 頻道資訊
+
+Discord 權限 / 限制
+- 需要開啟 Message Content Intent
+- Bot 透過頻道訊息讀取提示詞文字
+- 若使用 guild sync，可讓斜線指令立即生效
+- 若 global sync，Discord 指令可能要等待最長約 1 小時傳播
+
+Discord 同步需求
+- 支援多個 guild id，以逗號分隔
+- 啟動時可同步到多個 guild
+- 需避免重複指令
+- 若採 guild sync，需要處理舊 global command 清除問題
+
+========================================
+七、影片生成類型
+========================================
+
+目前需要支援 7 種生成類型
+- text_to_video
+- image_to_video
+- ref_subject
+- ref_style
+- video_extend
+- inpaint_insert
+- inpaint_remove
+
+各類型概念
+- text_to_video
+  - 只有文字提示詞
+- image_to_video
+  - 至少 1 張圖片作為起始參考
+- ref_subject
+  - 1 至 3 張圖片作為主體參考
+- ref_style
+  - 1 至 3 張圖片作為風格參考
+- video_extend
+  - 以影片延伸方式生成
+- inpaint_insert
+  - 影片 + 遮罩，將內容插入指定區域
+- inpaint_remove
+  - 影片 + 遮罩，移除指定區域內容
+
+========================================
+八、目前專案的 Veo / Gemini 規則與限制
+========================================
+
+請優先遵守目前專案已編碼的規則，尤其在 Discord Bot 端必須防呆。
+
+Gemini / Google 端目前已知規則
+- durationSeconds 合法值以目前專案控制為主
+- 1080p 以上需特別注意片長限制
+- video_extend 有更嚴格限制
+- 有些官方文件與實測行為不完全一致，因此需要同時保留：
+  - 官方規格說明
+  - 專案內已驗證的 workaround
+
+目前專案內已反映的重要規則
+- 1080p 與 2K 在 Bot 內只允許較高片長組合
+- Bot 已移除 4K 選項，因為很容易超過 Discord 檔案上傳限制
+- video_extend 需特殊處理
+- ref_subject / ref_style 需特殊處理
+- Bot 端必須對 duration / quality / gen_type 組合做自動修正
+
+重建時應保留下列設計原則
+- 不要把不合法的組合真的送去 API
+- 在 UI 就先修正並提示使用者
+- 若 API 回傳明確規格錯誤，要把錯誤原文顯示出來
+
+========================================
+九、輸出與資料儲存需求
+========================================
+
+輸出資料夾
+- outputs/inputs
+- outputs/videos
+
+資料夾
+- data/app_config.json
+- data/app_config.backup.json
+- data/veo_app.db
+- data/usage_log.csv
+- data/usage_log.json
+
+使用紀錄必須同時寫入
+- CSV：方便 Excel 檢視
+- JSON：方便程式結構化讀取
+
+使用紀錄欄位至少應包含
+- timestamp
+- source
+- discord_user_name
+- discord_user_id
+- discord_guild_name
+- discord_guild_id
+- discord_channel_name
+- discord_channel_id
+- conversation_id
+- command_id
+- gen_type
+- gen_type_label
+- prompt_preview
+- duration_seconds
+- aspect_ratio
+- quality
+- estimated_tokens
+- estimated_cost_usd
+- estimated_cost_ntd
+- elapsed_seconds
+- status
+- error_message
+- video_path
+- provider
+
+========================================
+十、資料庫需求
+========================================
+
+至少需要兩張表
+- conversations
+- commands
+
+commands 至少需要紀錄
+- prompt
+- image_paths
+- duration_seconds
+- aspect_ratio
+- quality
+- gen_type
+- status
+- output_video_path
+- provider_job_id
+- raw_response
+- estimated_tokens
+- estimated_cost_usd
+- estimated_cost_ntd
+- elapsed_seconds
+- from_discord
+- discord_user
+- discord_guild
+- discord_channel
+- error_message
+- source_command_id
+
+========================================
+十一、啟動流程需求
+========================================
+
+run_local.bat 應做到
+- 若 .venv 損壞則自動重建
+- 安裝 requirements.txt
+- 執行資料庫 migration
+- 啟動桌面程式
+
+重要
+- migration 腳本需考慮舊資料庫升級
+- 若是全新環境，也要能正常建立資料表，不應因 migration 順序導致失敗
+
+========================================
+十二、成本估算需求
+========================================
+
+需顯示
+- estimated_tokens
+- estimated_cost_usd
+- estimated_cost_ntd
+
+需可設定
+- 每秒成本
+- 畫質倍率
+- NTD 匯率
+
+Discord 與桌面都應顯示成本估算
+
+========================================
+十三、已知踩坑點與重建時必須避開的問題
+========================================
+
+1. Google API inlineData 問題
+- 某些模型會回報 inlineData 不支援
+- 需有 fallback 邏輯
+- 錯誤字串比對要寬鬆，不能只比對完全相同句子
+
+2. Discord 未受回應
+- 若 slash command handler 內發生例外而未妥善回應，Discord 會顯示「該申請未受回應」
+- 必須加全域錯誤處理與指令內 try/except
+
+3. Discord Message Content Intent
+- 若未在 Developer Portal 開啟，Bot 即使程式碼正確也可能無法正常讀取訊息內容
+
+4. 全域指令與 guild 指令重複
+- 切換同步策略時可能出現兩個同名指令
+- 需明確設計同步與清理流程
+
+5. 使用者素材輸入流程
+- Discord Modal 不能直接上傳檔案
+- 因此目前採用「Bot 發頻道提示 -> 使用者在頻道直接送文字與附件 -> Bot wait_for 擷取」流程
+
+6. API 已完成但沒有影片 URI
+- 某些情況 Google operation done=true，但 response 結構與預期不同
+- 需保留 debug 日誌
+- 需解析多種可能路徑
+- 若仍沒有 URI，應把完整回應輸出到終端以便排查
+
+7. 配額 / 帳單問題
+- 常見錯誤：
+  - RESOURCE_EXHAUSTED
+  - exceeded spending cap
+- 必須把 API 原始錯誤資訊完整顯示給使用者
+
+8. README 與實作不一致
+- README 舊內容提到 /veo
+- 但目前實作已是 /veo3
+- 重建時應以 /veo3 為準
+
+========================================
+十四、重建時建議的實作優先順序
+========================================
+
+Phase 1
+- 建立專案骨架
+- 完成 config / db / models / storage
+- 完成 veo_client 基本 text_to_video 流程
+- 完成桌面基本 UI
+
+Phase 2
+- 加入多對話與歷史命令
+- 加入圖片 / 影片素材輸入
+- 加入 usage logger
+- 加入成本估算
+
+Phase 3
+- 擴充 7 種 gen_type
+- 加入 Discord Bot
+- 加入 Discord 互動式 UI
+- 加入 guild sync / global sync 邏輯
+
+Phase 4
+- 加入資料庫 migration
+- 補強 fallback / debug / 例外處理
+- 補上教學頁與細部 UX
+
+========================================
+十五、可直接交給 AI 的完整重建提示詞
+========================================
+
+以下是可直接貼給 AI 的完整提示詞：
+
+請幫我從零重建一個名為「Veo 3.1 Local Studio」的 Python 專案，目標是做成一個可在 Windows 本機執行的 Veo 3.1 影片生成工具。請以 Python 3.10+ 為基礎，主要技術棧使用 Tkinter、FastAPI、SQLAlchemy、SQLite、requests、discord.py、tkinterdnd2。
+
+這個專案必須同時包含三個入口能力：
+1. 桌面視窗應用程式（主要使用方式）
+2. FastAPI API 與簡單靜態頁
+3. Discord Bot `/veo3` 互動式生成流程
+
+請依照以下規格實作：
+
+一、桌面程式
+- 使用 Tkinter 建立主視窗
+- 左側為對話列表
+- 中間為提示詞輸入區、素材清單、生成選項、狀態顯示
+- 右側為歷史命令列表，可點選載入後重新修改生成
+- 支援新增對話、切換對話、保存命令歷史
+- 支援圖片 / 影片素材匯入
+- 若可行，支援拖放素材
+- 支援素材排序
+- 支援主題切換（明 / 暗）
+- 上方提供「功能主頁 / Discord 教學 / 使用教學 / Gemini API 教學 / 使用量花費 / 設定頁面」等區域
+
+二、設定系統
+- 將設定保存到 data/app_config.json
+- 需同時維護備份檔 app_config.backup.json
+- 設定欄位至少包含：
+  - veo_api_base
+  - veo_api_key
+  - veo_model
+  - max_image_inputs
+  - discord_bot_token
+  - discord_enabled
+  - discord_sync_guild_ids
+  - backup_apis
+  - cost_per_second_usd
+  - quality_multipliers
+  - ntd_rate
+  - ui_theme
+  - ui_state
+
+三、資料庫
+- 使用 SQLAlchemy + SQLite
+- 至少建立 conversations 與 commands 兩張表
+- commands 需保存 prompt、素材路徑、duration、aspect_ratio、quality、gen_type、status、output_video_path、provider_job_id、raw_response、estimated_tokens、estimated_cost_usd、estimated_cost_ntd、elapsed_seconds、Discord 來源資訊、error_message、source_command_id 等欄位
+
+四、Veo 服務層
+- 建立 veo_client.py，封裝影片生成流程
+- 支援主 API 與 backup_apis 備援切換
+- 若 api_base 是 Google Gemini 官方端點，使用官方方式呼叫 long-running operation
+- 若是自訂後端，支援 POST {API_BASE}/generate
+- 要能處理：
+  - video_base64
+  - video_url
+  - local_saved_path
+- 要有成本估算函數 estimate_cost
+- 若 Google API 回報 inlineData 不支援，需有 fallback 邏輯
+- 若 operation done=true 但沒有影片 URI，要保留 debug 訊息並顯示可排查錯誤
+
+五、生成類型
+- 支援以下 7 種：
+  - text_to_video
+  - image_to_video
+  - ref_subject
+  - ref_style
+  - video_extend
+  - inpaint_insert
+  - inpaint_remove
+- 各類型需正確建立對應 request payload
+
+六、Discord Bot
+- 使用 discord.py
+- 指令名稱固定為 `/veo3`
+- 使用者輸入 `/veo3` 後，不要直接要求在 slash command 參數中上傳素材
+- 正確流程為：
+  1. Bot 顯示設定選單
+  2. 使用者選擇片長、比例、畫質、生成類型
+  3. Bot 在頻道發送提示訊息
+  4. 使用者直接在頻道輸入提示詞並附加素材
+  5. Bot 使用 wait_for(message) 擷取該訊息
+  6. Bot 顯示確認卡片
+  7. 使用者按下開始生成
+  8. Bot 顯示動畫進度
+  9. 成功後直接把影片傳到 Discord 頻道
+- Bot 需顯示估算 Token / USD / NTD / 耗時 / 使用者資訊 / 伺服器資訊 / 頻道資訊
+- 需有全域錯誤處理，避免 Discord 顯示「該申請未受回應」
+- 需支援 guild sync 與 global sync
+- discord_sync_guild_ids 需支援多個伺服器 ID，以逗號分隔
+- 需避免全域指令與 guild 指令重複
+- Bot 必須依賴 Message Content Intent，程式內也要設 intents.message_content = True
+
+七、Bot 端生成規則
+- Bot 畫質選項只保留 720p、1080p、2K
+- 不要提供 4K，因為很容易超過 Discord 檔案上傳限制
+- UI 要在送出前自動修正不合法的 duration / quality / gen_type 組合
+- 錯誤要顯示給使用者，不可靜默失敗
+
+八、使用紀錄
+- 建立 usage_logger.py
+- 每次生成都要同時寫入：
+  - data/usage_log.csv
+  - data/usage_log.json
+- 紀錄欄位至少包含時間、來源、Discord 來源資訊、gen_type、prompt_preview、duration、aspect_ratio、quality、estimated_tokens、estimated_cost_usd、estimated_cost_ntd、elapsed_seconds、status、error_message、video_path、provider
+
+九、FastAPI
+- 提供設定、對話、命令、生成、使用量統計等 API
+- 靜態輸出需可訪問 outputs
+
+十、啟動腳本
+- 提供 scripts/run_local.bat
+- 若 .venv 壞掉要能自動重建
+- 啟動前安裝 requirements
+- 執行資料庫 migration
+- 再啟動桌面程式
+
+十一、錯誤處理
+- 保留 Google API 原始錯誤訊息
+- 發生 RESOURCE_EXHAUSTED 或 exceeded spending cap 時，要把訊息直接顯示給使用者
+- 不要隱藏 API 真實錯誤
+
+十二、檔案結構
+- 請建立合理模組化結構：
+  - app/
+  - app/services/
+  - app/static/
+  - data/
+  - outputs/
+  - scripts/
+
+十三、程式碼要求
+- 模組化
+- 可維護
+- 註解精簡但清楚
+- 對外文字介面以繁體中文為主
+- 先完成可執行版本，再補強 UX
+
+請先輸出完整檔案結構規劃與各檔案責任，再逐步實作。
+
+========================================
+十六、如果要分段請 AI 重建，可使用的子提示詞
+========================================
+
+子提示詞 A：先建骨架
+- 先幫我建立 Veo 3.1 Local Studio 的完整 Python 專案骨架，包含 app、services、static、scripts、data、outputs，以及 requirements.txt、launcher.py、run_local.bat。
+
+子提示詞 B：先做桌面版
+- 請先只實作桌面版 Tkinter 主視窗、對話管理、素材清單、基本設定頁與 text_to_video 生成功能，先不要做 Discord Bot。
+
+子提示詞 C：補 Veo API 層
+- 請補上 veo_client.py，支援 Google Gemini 官方端點與自訂 /generate 端點，並處理 long-running operation、fallback、影片下載與錯誤輸出。
+
+子提示詞 D：補 Discord Bot
+- 請為專案加入 discord.py Bot，實作 /veo3 指令，流程為設定卡片 -> 頻道訊息輸入提示詞與素材 -> 確認卡片 -> 生成動畫 -> 成功上傳影片。
+
+子提示詞 E：補 logging / migration
+- 請加入 usage_logger.py、CSV/JSON 雙寫入、SQLite schema migration 腳本，以及 Windows 啟動腳本的虛擬環境自動修復。
+
+========================================
+十七、重建時的驗收清單
+========================================
+
+重建完成後，至少驗證：
+- 桌面程式能正常啟動
+- 可建立對話
+- 可輸入提示詞與素材
+- 可生成影片
+- 可把輸出存到 outputs/videos
+- 歷史命令可回載
+- usage_log.csv / usage_log.json 有寫入
+- Discord Bot 可登入
+- /veo3 可正常出現
+- 可在頻道輸入提示詞與附件
+- Bot 生成成功後能回傳影片
+- API 錯誤能顯示原始訊息
+
+文件結束

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Veo 3.1 Local Studio - 使用說明</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body style="padding: 24px; max-width: 900px; margin: 0 auto">
+    <h1>Veo 3.1 Local Studio 使用說明</h1>
+    <ol>
+      <li>先於主頁「API 與模型設定」填入 API Base URL、API Key、模型名稱並儲存。</li>
+      <li>建立新對話後，輸入文字 Prompt，並可上傳多張圖片作為參考。</li>
+      <li>選擇影片長度、畫面比例與畫質，按下「生成影片」。</li>
+      <li>每次生成都會記錄於右側歷史，可一鍵載入修改再生成。</li>
+      <li>影片固定存放在專案資料夾 `outputs/videos`。</li>
+      <li>啟用 Discord Bot 後重啟服務，即可於 Discord 以 `/veo` 指令生成。</li>
+    </ol>
+    <h2>Discord 指令</h2>
+    <p>`/veo prompt:"..." duration_seconds:8 aspect_ratio:"16:9" quality:"1080p"`</p>
+    <h2>主題切換</h2>
+    <p>
+      右上角「切換主題」可切換暗色（Discord 風格）與明色（Apple 官網風格）。
+    </p>
+    <h2>縮圖</h2>
+    <p>
+      目前圖標統一使用 `static/assets/oeu4f-vstm7-001.ico`。
+    </p>
+  </body>
+</html>
