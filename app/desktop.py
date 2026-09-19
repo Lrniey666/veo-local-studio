@@ -1541,7 +1541,7 @@ class VeoDesktopApp:
             content,
             "安全提醒",
             "Discord Bot Token 就是密碼，勿外流。若懷疑洩漏，請立即 Reset Token。\n"
-            "建議不要把 data/app_config.json 上傳到公開倉庫。",
+            "建議不要把 data/app_config.json 上傳到公開 Repository。",
         )
 
         self._apply_tutorial_theme()
