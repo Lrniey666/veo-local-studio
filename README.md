@@ -1,30 +1,30 @@
-<p align="center">
+<div align="center">
   <a href="#readme"><img alt="繁體中文" src="https://img.shields.io/badge/%E7%B9%81%E9%AB%94%E4%B8%AD%E6%96%87-e8c15a?style=for-the-badge&labelColor=11141c"></a>
   <a href="docs/README.en.md"><img alt="English" src="https://img.shields.io/badge/English-5865f2?style=for-the-badge&labelColor=11141c"></a>
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <img src="docs/assets/hero.svg" alt="Veo Local Studio" width="760">
-</p>
+</div>
 
 <h1 align="center">Veo Local Studio</h1>
 
-<p align="center">
+<div align="center">
   <strong>本機桌面的 Veo 3.1 影片工作室</strong><br>
   對話、素材、歷史與成本都留在這台電腦。<br>
   Discord 的 <code>/veo3</code> 是選用入口，不是產品本體。
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <img alt="release" src="https://img.shields.io/badge/release-1.0.0-e8c15a?style=flat-square&labelColor=11141c">
   <img alt="python" src="https://img.shields.io/badge/python-%E2%89%A53.10-3776AB?style=flat-square&logo=python&logoColor=white">
   <img alt="desktop" src="https://img.shields.io/badge/ui-Tkinter-11141c?style=flat-square">
   <img alt="discord.py" src="https://img.shields.io/badge/discord.py-2.5-5865F2?style=flat-square&logo=discord&logoColor=white">
   <img alt="locale" src="https://img.shields.io/badge/locale-zh--Hant%20%2F%20en--GB-e8c15a?style=flat-square&labelColor=11141c">
   <img alt="licence" src="https://img.shields.io/badge/licence-MIT-6b6b6b?style=flat-square&labelColor=11141c">
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <a href="#功能">功能</a> ·
   <a href="#示範">示範</a> ·
   <a href="#架構">架構</a> ·
@@ -33,7 +33,7 @@
   <a href="#貢獻">貢獻</a> ·
   <a href="docs/README.md">文件索引</a> ·
   <a href="CHANGELOG.md">變更紀錄</a>
-</p>
+</div>
 
 ---
 
@@ -80,30 +80,30 @@ Veo 的生成不該散落在瀏覽器分頁、試算表與聊天室。Veo Local 
 
 桌面畫面為 2026-09-19 本機實拍（示範對話，未填真實金鑰）。Discord 為依現行 `/veo3` 字串繪製的示意，不是線上伺服器截圖。
 
-<p align="center">
+<div align="center">
   <img src="docs/assets/demo-desktop-dark.png" alt="暗色主題：左側對話、中央提示詞與生成選項、右側歷史命令" width="760">
-</p>
-<p align="center"><sub>暗色主畫面。示範提示詞是黃昏海岸跟拍；右側可載入先前命令再生成。</sub></p>
+</div>
+<div align="center"><sub>暗色主畫面。示範提示詞是黃昏海岸跟拍；右側可載入先前命令再生成。</sub></div>
 
-<p align="center">
+<div align="center">
   <img src="docs/assets/demo-desktop-light.png" alt="明色主題的同一主畫面" width="760">
-</p>
-<p align="center"><sub>同一佈局的明色主題。</sub></p>
+</div>
+<div align="center"><sub>同一佈局的明色主題。</sub></div>
 
-<p align="center">
+<div align="center">
   <img src="docs/assets/demo-settings.png" alt="設定頁：主 API、備用 API、尚未填入的金鑰" width="560">
-</p>
-<p align="center"><sub>設定頁集中管理模型、備援端點、Discord Token 與成本參數。金鑰欄位留空不覆蓋。</sub></p>
+</div>
+<div align="center"><sub>設定頁集中管理模型、備援端點、Discord Token 與成本參數。金鑰欄位留空不覆蓋。</sub></div>
 
-<p align="center">
+<div align="center">
   <img src="docs/assets/demo-usage.png" alt="用量頁：命令數、秒數、畫質長條圖" width="560">
-</p>
-<p align="center"><sub>用量與花費：總命令、成功數、秒數與畫質分布。</sub></p>
+</div>
+<div align="center"><sub>用量與花費：總命令、成功數、秒數與畫質分布。</sub></div>
 
-<p align="center">
+<div align="center">
   <img src="docs/assets/demo-discord.png" alt="Discord /veo3 設定卡與完成卡示意" width="720">
-</p>
-<p align="center"><sub><code>/veo3</code> 第一步設定卡與完成卡示意。完整步驟見 <a href="docs/discord.md">docs/discord.md</a>。</sub></p>
+</div>
+<div align="center"><sub><code>/veo3</code> 第一步設定卡與完成卡示意。完整步驟見 <a href="docs/discord.md">docs/discord.md</a>。</sub></div>
 
 ### 一條完整路徑
 

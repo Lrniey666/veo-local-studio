@@ -1,30 +1,30 @@
-<p align="center">
+<div align="center">
   <a href="../README.md"><img alt="繁體中文" src="https://img.shields.io/badge/%E7%B9%81%E9%AB%94%E4%B8%AD%E6%96%87-5865f2?style=for-the-badge&labelColor=11141c"></a>
   <a href="#readme"><img alt="English" src="https://img.shields.io/badge/English-e8c15a?style=for-the-badge&labelColor=11141c"></a>
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <img src="assets/hero.svg" alt="Veo Local Studio" width="760">
-</p>
+</div>
 
 <h1 align="center">Veo Local Studio</h1>
 
-<p align="center">
+<div align="center">
   <strong>A Windows desktop studio for Veo 3.1</strong><br>
   Conversations, references, history and cost estimates stay on this machine.<br>
   Discord <code>/veo3</code> is an optional door — not the product.
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <img alt="release" src="https://img.shields.io/badge/release-1.0.0-e8c15a?style=flat-square&labelColor=11141c">
   <img alt="python" src="https://img.shields.io/badge/python-%E2%89%A53.10-3776AB?style=flat-square&logo=python&logoColor=white">
   <img alt="desktop" src="https://img.shields.io/badge/ui-Tkinter-11141c?style=flat-square">
   <img alt="discord.py" src="https://img.shields.io/badge/discord.py-2.5-5865F2?style=flat-square&logo=discord&logoColor=white">
   <img alt="locale" src="https://img.shields.io/badge/locale-zh--Hant%20%2F%20en--GB-e8c15a?style=flat-square&labelColor=11141c">
   <img alt="licence" src="https://img.shields.io/badge/licence-MIT-6b6b6b?style=flat-square&labelColor=11141c">
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <a href="#features">Features</a> ·
   <a href="#demo">Demo</a> ·
   <a href="#architecture">Architecture</a> ·
@@ -33,7 +33,7 @@
   <a href="#contributing">Contributing</a> ·
   <a href="./README.md">Docs index</a> ·
   <a href="../CHANGELOG.md">Changelog</a>
-</p>
+</div>
 
 ---
 
@@ -82,30 +82,30 @@ Paste a bot token in Settings, restart, then run `/veo3` in a channel: menus →
 
 Desktop frames were captured on this machine on 2026-09-19 with demonstration conversations and no real keys. The Discord image is drawn from the current `/veo3` copy; it is not a live-server screenshot.
 
-<p align="center">
+<div align="center">
   <img src="assets/demo-desktop-dark.png" alt="Dark theme: conversations, prompt and history" width="760">
-</p>
-<p align="center"><sub>Dark main window. The sample prompt is a dusk shoreline follow-shot; the right-hand list reloads earlier commands.</sub></p>
+</div>
+<div align="center"><sub>Dark main window. The sample prompt is a dusk shoreline follow-shot; the right-hand list reloads earlier commands.</sub></div>
 
-<p align="center">
+<div align="center">
   <img src="assets/demo-desktop-light.png" alt="The same main window in the light theme" width="760">
-</p>
-<p align="center"><sub>The same layout in the light theme.</sub></p>
+</div>
+<div align="center"><sub>The same layout in the light theme.</sub></div>
 
-<p align="center">
+<div align="center">
   <img src="assets/demo-settings.png" alt="Settings: primary API, fallback API, empty key fields" width="560">
-</p>
-<p align="center"><sub>Settings holds the model, fallback endpoint, Discord token and cost model. Leaving a key blank keeps the stored value.</sub></p>
+</div>
+<div align="center"><sub>Settings holds the model, fallback endpoint, Discord token and cost model. Leaving a key blank keeps the stored value.</sub></div>
 
-<p align="center">
+<div align="center">
   <img src="assets/demo-usage.png" alt="Usage page with command counts and a quality bar chart" width="560">
-</p>
-<p align="center"><sub>Usage and spend: command counts, seconds and quality mix.</sub></p>
+</div>
+<div align="center"><sub>Usage and spend: command counts, seconds and quality mix.</sub></div>
 
-<p align="center">
+<div align="center">
   <img src="assets/demo-discord.png" alt="Illustrated Discord /veo3 settings and completion cards" width="720">
-</p>
-<p align="center"><sub>Illustrated <code>/veo3</code> settings and completion cards. The full walk-through is in <a href="./discord.md">discord.md</a>.</sub></p>
+</div>
+<div align="center"><sub>Illustrated <code>/veo3</code> settings and completion cards. The full walk-through is in <a href="./discord.md">discord.md</a>.</sub></div>
 
 ### One complete path
 
