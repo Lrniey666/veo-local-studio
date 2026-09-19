@@ -1,10 +1,8 @@
 import json
-from pathlib import Path
 
+from .paths import DATA_DIR, ensure_runtime_dirs
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "data"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
+ensure_runtime_dirs()
 CONFIG_PATH = DATA_DIR / "app_config.json"
 CONFIG_BACKUP_PATH = DATA_DIR / "app_config.backup.json"
 
@@ -16,7 +14,7 @@ DEFAULT_CONFIG = {
     "max_image_inputs": 8,
     "discord_bot_token": "",
     "discord_enabled": False,
-    "discord_sync_guild_ids": "",   # 填伺服器 ID（可多個，以逗號分隔）可讓指令立即生效，留空則全域同步（最多 1 小時）
+    "discord_sync_guild_ids": "",
     "backup_apis": [],
     "cost_per_second_usd": 0.04,
     "quality_multipliers": {"720p": 1.0, "1080p": 1.4, "2k": 2.0, "4k": 3.2},
@@ -32,7 +30,6 @@ def load_config() -> dict:
     try:
         raw = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
     except Exception:
-        # Fallback to backup if the main file is interrupted/corrupted.
         if CONFIG_BACKUP_PATH.exists():
             raw = json.loads(CONFIG_BACKUP_PATH.read_text(encoding="utf-8"))
         else:
@@ -44,7 +41,6 @@ def load_config() -> dict:
 
 def save_config(data: dict) -> dict:
     merged = DEFAULT_CONFIG.copy()
-    # Preserve existing keys so saving one section does not wipe others.
     if CONFIG_PATH.exists():
         try:
             existing = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))

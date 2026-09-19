@@ -6,3 +6,8 @@ outputs/
 dist/
 build/
 *.spec
+.env
+*.lnk
+installer/output/
+.DS_Store
+Thumbs.db

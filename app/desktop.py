@@ -13,6 +13,7 @@ import webbrowser
 from .config import load_config, mask_key, save_config
 from .db import Base, SessionLocal, engine
 from .models import CommandRecord, Conversation
+from .paths import ASSETS_DIR, VIDEOS_DIR
 from .services.discord_bot import run_bot_in_thread
 from .services.storage import save_uploaded_image
 from .services.usage_logger import log_usage
@@ -31,7 +32,7 @@ except Exception:
 class VeoDesktopApp:
     def __init__(self, root: tk.Tk):
         self.root = root
-        self.root.title("Veo 3.1 Local Studio")
+        self.root.title("Veo Local Studio")
         self.root.geometry("1600x900")
         self.root.minsize(980, 620)
         self.root.option_add("*Font", ("Microsoft JhengHei", 10))
@@ -82,14 +83,19 @@ class VeoDesktopApp:
         self.root.protocol("WM_DELETE_WINDOW", self.on_app_close)
 
     def _load_logo_assets(self):
-        assets_dir = Path(__file__).resolve().parent.parent / "static" / "assets"
-        icon_path = assets_dir / "oeu4f-vstm7-001.ico"
+        icon_path = ASSETS_DIR / "app.ico"
+        logo_path = ASSETS_DIR / "logo.png"
         if icon_path.exists():
             self.icon_ico_path = icon_path
             try:
                 self.root.iconbitmap(default=str(icon_path))
             except Exception:
                 pass
+        try:
+            if logo_path.exists():
+                self.logo_image = tk.PhotoImage(file=str(logo_path))
+        except Exception:
+            self.logo_image = None
 
     @staticmethod
     def _google_default_base() -> str:
@@ -98,15 +104,6 @@ class VeoDesktopApp:
     @staticmethod
     def _google_default_model() -> str:
         return "veo-3.1-generate-preview"
-
-        logo_path = assets_dir / "logo.png"
-        try:
-            if logo_path.exists():
-                self.logo_image = tk.PhotoImage(file=str(logo_path))
-            elif icon_path.exists():
-                self.logo_image = tk.PhotoImage(file=str(icon_path))
-        except Exception:
-            self.logo_image = None
 
     def _apply_window_icon(self, window: tk.Toplevel):
         if self.icon_ico_path and self.icon_ico_path.exists():
@@ -155,18 +152,20 @@ class VeoDesktopApp:
         self.main = tk.Frame(self.root)
         self.main.pack(fill="both", expand=True)
 
-        self.left = tk.Frame(self.main, width=280)
+        self.left = tk.Frame(self.main, width=260)
         self.center = tk.Frame(self.main)
-        self.right = tk.Frame(self.main, width=380)
+        self.right = tk.Frame(self.main, width=320)
         self.left.pack(side="left", fill="y")
+        self.left.pack_propagate(False)
         self.center.pack(side="left", fill="both", expand=True)
         self.right.pack(side="left", fill="y")
+        self.right.pack_propagate(False)
 
         left_header = tk.Frame(self.left)
         left_header.pack(fill="x", padx=14, pady=(16, 8))
         if self.logo_image:
             tk.Label(left_header, image=self.logo_image).pack(side="left", padx=(0, 10))
-        tk.Label(left_header, text="Veo 3.1 對話", font=("Microsoft JhengHei", 12, "bold")).pack(side="left")
+        tk.Label(left_header, text="對話", font=("Microsoft JhengHei", 12, "bold")).pack(side="left")
         self.new_conv_btn = tk.Button(self.left, text="+ 新對話", command=self.create_conversation)
         self.new_conv_btn.pack(padx=14, pady=6, fill="x")
         self.conv_list = tk.Listbox(self.left, exportselection=False)
@@ -175,26 +174,29 @@ class VeoDesktopApp:
 
         top_actions = tk.Frame(self.center)
         top_actions.pack(fill="x", padx=20, pady=(16, 8))
-        self.current_conv_label = tk.Label(top_actions, text="尚未選擇對話", font=("Microsoft JhengHei", 13, "bold"))
+        title_row = tk.Frame(top_actions)
+        title_row.pack(fill="x")
+        self.current_conv_label = tk.Label(title_row, text="尚未選擇對話", font=("Microsoft JhengHei", 13, "bold"))
         self.current_conv_label.pack(side="left")
-        self.open_settings_btn = tk.Button(top_actions, text="設定頁面", command=self.open_settings_page)
-        self.open_settings_btn.pack(side="right", padx=5)
-        self.open_usage_btn = tk.Button(top_actions, text="用量與花費", command=self.open_usage_page)
-        self.open_usage_btn.pack(side="right", padx=5)
-        self.open_gemini_tutorial_btn = tk.Button(
-            top_actions, text="Gemini API 教學", command=self.open_gemini_tutorial
-        )
-        self.open_gemini_tutorial_btn.pack(side="right", padx=5)
-        self.open_guide_btn = tk.Button(top_actions, text="使用教學", command=self.open_usage_guide)
-        self.open_guide_btn.pack(side="right", padx=5)
-        self.discord_tutorial_btn = tk.Button(
-            top_actions, text="Discord 教學", command=self.open_discord_tutorial
-        )
-        self.discord_tutorial_btn.pack(side="right", padx=5)
-        self.restart_btn = tk.Button(top_actions, text="重啟應用", command=self.restart_application)
-        self.restart_btn.pack(side="right", padx=5)
-        self.toggle_theme_btn = tk.Button(top_actions, text="切換主題", command=self.toggle_theme)
-        self.toggle_theme_btn.pack(side="right", padx=5)
+        button_row = tk.Frame(top_actions)
+        button_row.pack(fill="x", pady=(8, 0))
+        self.toggle_theme_btn = tk.Button(button_row, text="切換主題", command=self.toggle_theme)
+        self.restart_btn = tk.Button(button_row, text="重啟應用", command=self.restart_application)
+        self.discord_tutorial_btn = tk.Button(button_row, text="Discord 教學", command=self.open_discord_tutorial)
+        self.open_guide_btn = tk.Button(button_row, text="使用教學", command=self.open_usage_guide)
+        self.open_gemini_tutorial_btn = tk.Button(button_row, text="Gemini API 教學", command=self.open_gemini_tutorial)
+        self.open_usage_btn = tk.Button(button_row, text="用量與花費", command=self.open_usage_page)
+        self.open_settings_btn = tk.Button(button_row, text="設定頁面", command=self.open_settings_page)
+        for btn in (
+            self.toggle_theme_btn,
+            self.restart_btn,
+            self.discord_tutorial_btn,
+            self.open_guide_btn,
+            self.open_gemini_tutorial_btn,
+            self.open_usage_btn,
+            self.open_settings_btn,
+        ):
+            btn.pack(side="left", padx=(0, 6))
 
         cmd_box = tk.LabelFrame(self.center, text="命令輸入")
         cmd_box.pack(fill="both", expand=True, padx=20, pady=(12, 16))
@@ -902,7 +904,7 @@ class VeoDesktopApp:
         self.root.after(0, lambda: self._load_history(self.active_conversation_id))
 
     def open_outputs_folder(self):
-        out = Path(__file__).resolve().parent.parent / "outputs" / "videos"
+        out = VIDEOS_DIR
         out.mkdir(parents=True, exist_ok=True)
         try:
             import os
@@ -1238,7 +1240,7 @@ class VeoDesktopApp:
 
         shell = tk.Frame(guide, padx=14, pady=14)
         shell.pack(fill="both", expand=True)
-        tk.Label(shell, text="Veo 3.1 Local Studio 完整使用教學", font=("Microsoft JhengHei", 16, "bold")).pack(anchor="w")
+        tk.Label(shell, text="Veo Local Studio 完整使用教學", font=("Microsoft JhengHei", 16, "bold")).pack(anchor="w")
         tk.Label(shell, text="本頁僅說明應用程式本體，不含 Discord Bot。").pack(anchor="w", pady=(2, 10))
 
         viewport = tk.Frame(shell)
@@ -1429,8 +1431,8 @@ class VeoDesktopApp:
         self._add_tutorial_section(
             content,
             "重要提醒（本專案 API 格式）",
-            "本專案目前採 /generate 介面格式（回傳 video_url 或 video_base64）。\n"
-            "若你要直連官方原生端點，請確認你的 API Gateway/代理層已轉成此格式，或再讓我幫你接原生格式。",
+            "設定頁填 Google 官方端點時，會走 Veo 的 long-running operation。\n"
+            "若填自訂後端，則呼叫 POST {API_BASE}/generate，並接受 video_url 或 video_base64。",
         )
 
         self._apply_gemini_tutorial_theme()
@@ -1456,7 +1458,7 @@ class VeoDesktopApp:
         tk.Label(top, text="Discord Bot 保母級建立教學", font=("Microsoft JhengHei", 16, "bold")).pack(anchor="w")
         tk.Label(
             top,
-            text="從 0 到可用指令，照著做就能在本專案啟用 /veo",
+            text="從 0 到可用指令，照著做就能在本專案啟用 /veo3",
             font=("Microsoft JhengHei", 10),
         ).pack(anchor="w", pady=(3, 0))
 
@@ -1518,18 +1520,18 @@ class VeoDesktopApp:
         self._add_tutorial_section(
             content,
             "Step 5 - 在 Discord 測試",
-            "在有權限的頻道執行 /veo，帶入 prompt 與可選參數驗證是否可生成影片。",
+            "在有權限的頻道執行 /veo3，依選單設定片長、比例、畫質與生成類型，再於頻道輸入提示詞與素材。",
         )
         self._add_tutorial_code_block(
             content,
-            "Slash 指令範例",
-            '/veo prompt:"cinematic sunset beach" duration_seconds:8 aspect_ratio:"16:9" quality:"1080p"',
+            "Slash 指令",
+            "/veo3",
         )
 
         self._add_tutorial_section(
             content,
             "常見錯誤排除",
-            "看不到 /veo：檢查 applications.commands 與同步時間。\n"
+            "看不到 /veo3：檢查 applications.commands、Message Content Intent，以及是否填了伺服器 ID。\n"
             "沒反應：檢查 Token 與啟用開關。\n"
             "生成失敗：先測桌面端，再檢查 API Base / Key / model。\n"
             "圖片報錯：圖片數量不可超過 max_image_inputs。",

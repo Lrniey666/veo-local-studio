@@ -8,14 +8,11 @@ import csv
 import json
 import threading
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 
-from ..config import load_config
+from ..paths import DATA_DIR, ensure_runtime_dirs
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-DATA_DIR  = BASE_DIR / "data"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
+ensure_runtime_dirs()
 
 CSV_PATH  = DATA_DIR / "usage_log.csv"
 JSON_PATH = DATA_DIR / "usage_log.json"

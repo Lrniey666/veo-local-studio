@@ -17,9 +17,8 @@ from typing import Any
 import requests
 
 from ..config import load_config
+from ..paths import ROOT
 from .storage import save_video
-
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # ─── 公開常數 ───────────────────────────────────────────────────────────────
 
@@ -179,7 +178,7 @@ def generate_video(
         return {
             "provider_job_id": body.get("id") or body.get("job_id"),
             "video_path":      str(video_path),
-            "video_web_path":  "/" + video_path.relative_to(BASE_DIR).as_posix(),
+            "video_web_path":  "/" + video_path.relative_to(ROOT).as_posix(),
             "raw_response":    body,
             "used_provider":   p["name"],
             "gen_type":        gen_type,

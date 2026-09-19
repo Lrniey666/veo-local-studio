@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <title>Veo Local Studio — Discord /veo3</title>
+  <style>
+    :root {
+      --bg: #313338;
+      --panel: #2b2d31;
+      --chat: #313338;
+      --embed: #2b2d31;
+      --bar: #5865f2;
+      --text: #f2f3f5;
+      --muted: #b5bac1;
+      --green: #57f287;
+      --gold: #fee75c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "gg sans", "Noto Sans TC", "Segoe UI", sans-serif;
+      background: #1e1f22;
+      color: var(--text);
+    }
+    html, body { overflow: hidden; }
+    .app {
+      width: 1020px;
+      margin: 16px auto;
+      background: var(--bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(0,0,0,.45);
+    }
+    .top {
+      background: #2b2d31;
+      padding: 14px 20px;
+      border-bottom: 1px solid #1f2023;
+      font-weight: 650;
+    }
+    .top span { color: var(--muted); font-weight: 500; margin-left: 8px; }
+    .row { display: flex; }
+    .chan {
+      width: 220px;
+      background: #2b2d31;
+      padding: 16px 12px;
+      min-height: 720px;
+    }
+    .chan h2 { font-size: 11px; letter-spacing: .08em; color: #949ba4; margin: 0 8px 10px; }
+    .chan p { margin: 0 8px 8px; color: #dbdee1; font-size: 15px; }
+    .chan .on { color: #fff; background: #404249; border-radius: 6px; padding: 7px 8px; }
+    .main { flex: 1; padding: 18px 22px 28px; }
+    .msg { display: flex; gap: 14px; margin-bottom: 18px; }
+    .av {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #5865f2, #e8c15a);
+      flex: 0 0 40px;
+    }
+    .name { font-weight: 650; }
+    .name small { color: var(--muted); font-weight: 500; margin-left: 8px; }
+    .slash { color: #c4c9ce; margin: 4px 0 10px; }
+    .embed {
+      width: 520px;
+      border-left: 4px solid var(--bar);
+      background: #2b2d31;
+      border-radius: 4px;
+      padding: 12px 14px 10px;
+    }
+    .embed.ok { border-left-color: var(--green); }
+    .embed.warn { border-left-color: var(--gold); }
+    .embed h3 { margin: 0 0 6px; font-size: 16px; }
+    .embed p { margin: 0 0 10px; color: var(--muted); font-size: 14px; line-height: 1.45; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px 12px; margin-bottom: 10px; }
+    .field strong { display: block; font-size: 12px; color: #c4c9ce; margin-bottom: 2px; }
+    .field span { font-size: 14px; }
+    .selects { display: grid; gap: 8px; margin: 10px 0 8px; }
+    .sel {
+      background: #1e1f22;
+      border: 1px solid #1e1f22;
+      border-radius: 4px;
+      padding: 8px 10px;
+      color: #dbdee1;
+      font-size: 14px;
+    }
+    .btn {
+      display: inline-block;
+      background: #5865f2;
+      color: #fff;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .btn.ok { background: #248046; }
+    .foot { color: #949ba4; font-size: 12px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top"># studio-gen <span>Veo Local Studio · /veo3</span></div>
+    <div class="row">
+      <aside class="chan">
+        <h2>文字頻道</h2>
+        <p>一般</p>
+        <p class="on"># studio-gen</p>
+        <p># 測試</p>
+      </aside>
+      <main class="main">
+        <div class="msg">
+          <div class="av"></div>
+          <div>
+            <div class="name">Veo Local Studio <small>今天 17:12</small></div>
+            <div class="slash">/veo3</div>
+            <div class="embed">
+              <h3>🎬 Veo 3.1 影片生成設定</h3>
+              <p>請使用下方選單調整參數，完成後點擊「下一步 →」。所有選項已套用預設值。</p>
+              <div class="grid">
+                <div class="field"><strong>片長</strong><span>8 秒</span></div>
+                <div class="field"><strong>比例</strong><span>16:9</span></div>
+                <div class="field"><strong>畫質</strong><span>1080p</span></div>
+              </div>
+              <div class="field"><strong>生成類型</strong><span>✍️ 文字轉影片</span></div>
+              <div class="field" style="margin-top:8px"><strong>預估費用</strong><span>11,200 Token　≈ $0.4480 USD　≈ NT$14.34</span></div>
+              <div class="selects">
+                <div class="sel">⏱️ 8 秒</div>
+                <div class="sel">📐 16:9 橫向</div>
+                <div class="sel">🎯 1080p</div>
+                <div class="sel">✍️ 文字轉影片</div>
+              </div>
+              <span class="btn">下一步 →</span>
+              <div class="foot">第 1 步，共 3 步　｜　下一步：輸入提示詞</div>
+            </div>
+          </div>
+        </div>
+        <div class="msg">
+          <div class="av"></div>
+          <div>
+            <div class="name">Veo Local Studio <small>今天 17:15</small></div>
+            <div class="embed ok">
+              <h3>✅ 影片生成完成！</h3>
+              <div class="grid">
+                <div class="field"><strong>片長</strong><span>8 秒</span></div>
+                <div class="field"><strong>比例</strong><span>16:9</span></div>
+                <div class="field"><strong>畫質</strong><span>1080p</span></div>
+                <div class="field"><strong>生成用時</strong><span>2 分 22 秒</span></div>
+              </div>
+              <div class="field"><strong>費用</strong><span>預估 11,200 Token，約 NT$14.34</span></div>
+              <div class="field" style="margin-top:8px"><strong>提示詞</strong><span>黃昏海岸，低角度跟拍一名旅人走在潮線上。</span></div>
+              <span class="btn ok">相同設定再生成一次</span>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

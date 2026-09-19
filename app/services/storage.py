@@ -2,14 +2,9 @@ import secrets
 from datetime import datetime
 from pathlib import Path
 
+from ..paths import INPUTS_DIR, VIDEOS_DIR, ensure_runtime_dirs
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-OUTPUT_DIR = BASE_DIR / "outputs"
-INPUTS_DIR = OUTPUT_DIR / "inputs"
-VIDEOS_DIR = OUTPUT_DIR / "videos"
-
-for folder in (OUTPUT_DIR, INPUTS_DIR, VIDEOS_DIR):
-    folder.mkdir(parents=True, exist_ok=True)
+ensure_runtime_dirs()
 
 
 def unique_name(prefix: str, suffix: str) -> str:

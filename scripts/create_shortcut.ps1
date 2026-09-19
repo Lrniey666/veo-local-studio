@@ -1,8 +1,8 @@
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $target = Join-Path $projectRoot "scripts\run_local.bat"
 $desktop = [Environment]::GetFolderPath("Desktop")
-$shortcutPath = Join-Path $desktop "Veo 3.1 Local Studio.lnk"
-$iconPath = Join-Path $projectRoot "static\assets\oeu4f-vstm7-001.ico"
+$shortcutPath = Join-Path $desktop "Veo Local Studio.lnk"
+$iconPath = Join-Path $projectRoot "assets\app.ico"
 
 $wsh = New-Object -ComObject WScript.Shell
 $shortcut = $wsh.CreateShortcut($shortcutPath)

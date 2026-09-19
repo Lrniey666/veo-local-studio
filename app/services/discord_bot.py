@@ -655,9 +655,8 @@ class ConfirmView(ui.View):
             done_e.add_field(
                 name="💰 費用",
                 value=(
-                    f"你使用了 **{cost['tokens']:,}** 個 Token，"
-                    f"耗費了成田路的錢包約 **NT${cost['ntd']:.2f}** 元"
-                    f"（≈ **${cost['usd']:.4f}** USD）"
+                    f"預估 **{cost['tokens']:,}** Token，"
+                    f"約 **NT${cost['ntd']:.2f}**（≈ **${cost['usd']:.4f}** USD）"
                 ),
                 inline=False,
             )
@@ -701,8 +700,7 @@ class ConfirmView(ui.View):
             await inter.followup.send(
                 content=(
                     f"🎉 {inter.user.mention} 你的影片已生成完成！\n"
-                    f"> 你使用了 **{cost['tokens']:,}** 個 Token，"
-                    f"耗費了成田路的錢包約 **NT${cost['ntd']:.2f}** 元"
+                    f"> 預估 **{cost['tokens']:,}** Token，約 **NT${cost['ntd']:.2f}**"
                 ),
                 file=discord.File(result["video_path"]),
             )
